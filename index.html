@@ -1,87 +1,118 @@
- const cevapHavuzu = [
-  "Bu konuya yüzeysel bakmak yerine biraz derinleşmek gerekiyor.",
-  "Açıkçası bu soru düşündüğünden daha karmaşık.",
-  "Bu noktada acele karar vermek doğru olmaz.",
-  "Sorunun özü güzel ama cevabı tek boyutlu değil.",
-  "Bu meseleye farklı bir pencereden bakmak faydalı olabilir.",
-  "Bunu değerlendirirken birkaç ihtimali göz önünde bulundurmak lazım.",
-  "Net bir cevap vermek şu aşamada zor.",
-  "Bu konu sandığından daha fazla detaya sahip.",
-  "Mantık yürütürsek bazı sonuçlara varabiliriz.",
-  "Bu sorunun cevabı duruma göre değişiklik gösterebilir.",
-
-  "Bu ifade kendi içinde çelişkiler barındırıyor olabilir.",
-  "Bu konu hakkında kesin konuşmak kolay değil.",
-  "Bence burada gözden kaçan bir ayrıntı var.",
-  "Bu tarz sorular genelde insanı düşünmeye iter.",
-  "Sorunun kendisi cevabından daha dikkat çekici.",
-  "Bu konuyu basite indirgemek pek doğru olmaz.",
-  "Bu yaklaşım mantıklı ama eksik.",
-  "Bu fikir tamamen yanlış değil.",
-  "Burada önemli olan bakış açısı.",
-  "Bu durum farklı şekillerde yorumlanabilir.",
-
-  "Bunu söylerken biraz temkinli olmak gerekir.",
-  "Bu noktada netlik kazanmak zaman alabilir.",
-  "Sorunun arkasında başka bir anlam olabilir.",
-  "Bu konu tek bir cümleyle açıklanamaz.",
-  "Buna kesin bir yanıt vermek zor.",
-  "Bu mesele düşündüğünden daha geniş.",
-  "Burada küçük ama önemli bir detay var.",
-  "Bu soruya farklı açılardan yaklaşılabilir.",
-  "Bu konu genelde yanlış anlaşılıyor.",
-  "Bu yaklaşım kulağa hoş geliyor ama eksik.",
-
-  "Bu konuda herkesin fikri farklı olabilir.",
-  "Bu soru beklediğimden daha ilginç.",
-  "Bu tür sorular kafa karıştırıcı olabilir.",
-  "Bu meseleye net bir sınır çizmek zor.",
-  "Bu durum bağlama göre değişir.",
-  "Bu fikir üzerinde biraz düşünmek gerekir.",
-  "Bu konu sandığın kadar basit değil.",
-  "Bu yaklaşım teoride mantıklı duruyor.",
-  "Bu konuda kesin yargıya varmak zor.",
-  "Bu soru insanı ister istemez düşündürüyor.",
-
-  "Bu noktada varsayımlardan kaçınmak gerekir.",
-  "Bu fikir pratikte farklı sonuçlar doğurabilir.",
-  "Bu konu üzerinde çok fazla yorum yapılabilir.",
-  "Bu mesele tek bir cevaba sahip değil.",
-  "Bu soru net ama cevabı değil.",
-  "Bu durum farklı senaryolar içeriyor.",
-  "Bu konu zamanla daha netleşebilir.",
-  "Bu soruya bakış açısı önemli.",
-  "Bu mesele düşündüğünden daha derin.",
-  "Bu konu hakkında kesin konuşmak riskli."
-];
- function sacmaSiirUret() {
-  const baslangic = [
-    "Bir sabah uyandım, çay soğuktu",
-    "Pencere açıktı ama rüzgar kararsızdı",
-    "Saat duvarda bana bakıyordu",
-    "Ayakkabım neden burada bilmiyorum",
-    "Bugün her şey biraz garipti"
-  ];
-
-  const orta = [
-    "çünkü simitler felsefe yapıyordu",
-    "ve kediler ekonomi konuşuyordu",
-    "ben sustum, duvar cevap verdi",
-    "mantık o gün izin almıştı",
-    "aklım cebimde buruşmuştu"
-  ];
-
-  const bitis = [
-    "sonra çay tekrar soğudu.",
-    "kimse bir şey anlamadı.",
-    "ben de anlamış gibi yaptım.",
-    "ve hayat devam etti.",
-    "işte böyle bir gündü."
-  ];
-
-  return (
-    baslangic[Math.floor(Math.random()*baslangic.length)] + "\n" +
-    orta[Math.floor(Math.random()*orta.length)] + "\n" +
-    bitis[Math.floor(Math.random()*bitis.length)]
-  );
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Aptal 🤪 Yapay Zeka</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
 }
+#app{
+  width:90%;
+  max-width:600px;
+  background:#111;
+  border-radius:10px;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+}
+#messages{
+  flex:1;
+  overflow-y:auto;
+  margin-bottom:10px;
+}
+.msg{margin-bottom:6px}
+.user{color:#4fc3f7}
+.bot{color:#ffb74d}
+input{
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  outline:none;
+}
+.credit{
+  text-align:center;
+  font-size:11px;
+  opacity:.7;
+  margin-top:6px;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="messages"></div>
+  <input id="input" placeholder="Yaz ve Enter'a bas">
+  <div class="credit">Deniz Z tarafından yapıldı</div>
+</div>
+
+<script>
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+// === HAFIZA ===
+let hafiza = JSON.parse(localStorage.getItem("aptal_hafiza")) || [];
+
+function kaydet(){
+  localStorage.setItem("aptal_hafiza", JSON.stringify(hafiza));
+}
+
+function mesajEkle(tur, metin){
+  const d = document.createElement("div");
+  d.className = "msg " + tur;
+  d.innerHTML = (tur==="user"?"Sen: ":"Aptal: ") + metin;
+  messages.appendChild(d);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// === SAYFA AÇILINCA ESKİ MESAJLARI YÜKLE ===
+hafiza.forEach(m => mesajEkle(m.tur, m.metin));
+
+// === SAÇMA AMA ANLAMLI ŞİİR ===
+function sacmaSiir(){
+  const a=["Bir sabah uyandım","Pencere açıktı","Saat bana baktı"];
+  const b=["çünkü simitler düşünüyordu","mantık izin almıştı","kediler konuşuyordu"];
+  const c=["sonra sustuk.","kimse anlamadı.","hayat devam etti."];
+  return a[Math.random()*a.length|0]+"<br>"+
+         b[Math.random()*b.length|0]+"<br>"+
+         c[Math.random()*c.length|0];
+}
+
+// === BEYİN ===
+function cevapUret(text){
+  text=text.toLowerCase();
+  if(text.includes("şiir yaz")) return sacmaSiir();
+  if(text.includes("hikaye")) return "Bir varmış bir yokmuş… ama ben de emin değilim.";
+  return "Bunu düşündüm ama düşünürken kafam karıştı.";
+}
+
+// === ENTER ÇALIŞIYOR ===
+input.addEventListener("keydown", e=>{
+  if(e.key!=="Enter" || !input.value.trim()) return;
+
+  const text = input.value;
+  input.value="";
+
+  hafiza.push({tur:"user", metin:text});
+  mesajEkle("user", text);
+
+  setTimeout(()=>{
+    const reply = cevapUret(text);
+    hafiza.push({tur:"bot", metin:reply});
+    mesajEkle("bot", reply);
+    kaydet();
+  },300);
+
+  kaydet();
+});
+</script>
+
+</body>
+</html>
