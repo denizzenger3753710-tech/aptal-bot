@@ -1,4 +1,4 @@
-const cevapHavuzu = [
+ const cevapHavuzu = [
   "Bu konuya yüzeysel bakmak yerine biraz derinleşmek gerekiyor.",
   "Açıkçası bu soru düşündüğünden daha karmaşık.",
   "Bu noktada acele karar vermek doğru olmaz.",
@@ -54,3 +54,34 @@ const cevapHavuzu = [
   "Bu mesele düşündüğünden daha derin.",
   "Bu konu hakkında kesin konuşmak riskli."
 ];
+ function sacmaSiirUret() {
+  const baslangic = [
+    "Bir sabah uyandım, çay soğuktu",
+    "Pencere açıktı ama rüzgar kararsızdı",
+    "Saat duvarda bana bakıyordu",
+    "Ayakkabım neden burada bilmiyorum",
+    "Bugün her şey biraz garipti"
+  ];
+
+  const orta = [
+    "çünkü simitler felsefe yapıyordu",
+    "ve kediler ekonomi konuşuyordu",
+    "ben sustum, duvar cevap verdi",
+    "mantık o gün izin almıştı",
+    "aklım cebimde buruşmuştu"
+  ];
+
+  const bitis = [
+    "sonra çay tekrar soğudu.",
+    "kimse bir şey anlamadı.",
+    "ben de anlamış gibi yaptım.",
+    "ve hayat devam etti.",
+    "işte böyle bir gündü."
+  ];
+
+  return (
+    baslangic[Math.floor(Math.random()*baslangic.length)] + "\n" +
+    orta[Math.floor(Math.random()*orta.length)] + "\n" +
+    bitis[Math.floor(Math.random()*bitis.length)]
+  );
+}
