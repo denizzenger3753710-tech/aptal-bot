@@ -5,70 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CHATDNZ</title>
 
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🤖</text></svg>">
-
 <style>
 body{
  margin:0;
  font-family:Arial;
- background:linear-gradient(135deg,#020617,#0f172a);
- color:#fff;
- height:100vh;
- display:flex;
- flex-direction:column;
+ transition:.5s;
 }
+body.mutlu{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff}
+body.sinirli{background:linear-gradient(135deg,#dc2626,#7f1d1d);color:#fff}
+body.uzgun{background:linear-gradient(135deg,#2563eb,#1e3a8a);color:#fff}
+
 header{
  text-align:center;
  padding:8px;
  font-weight:bold;
  animation:parla 2s infinite alternate;
 }
+@keyframes parla{
+ from{text-shadow:0 0 6px #fff}
+ to{text-shadow:0 0 18px #fff}
+}
 #logo{
  position:fixed;
  top:8px;
  right:12px;
- font-size:20px;
  font-weight:900;
- cursor:pointer;
- animation:parla 2s infinite alternate;
 }
-@keyframes parla{
- from{text-shadow:0 0 6px #38bdf8}
- to{text-shadow:0 0 18px #38bdf8}
+#controls{
+ display:flex;
+ gap:6px;
+ padding:6px;
+ justify-content:center;
+}
+button{
+ padding:6px 10px;
+ border:none;
+ border-radius:6px;
+ cursor:pointer;
 }
 #chat{
- flex:1;
- padding:10px;
+ height:calc(100vh - 150px);
  overflow-y:auto;
+ padding:10px;
 }
 .msg{margin:6px 0}
-.user{color:#38bdf8}
-.bot{color:#fbbf24}
+.user{color:#facc15}
+.bot{color:#fff}
 footer{
  display:flex;
  gap:6px;
  padding:8px;
- background:#020617;
 }
-footer input{
+input{
  flex:1;
  padding:10px;
  border-radius:6px;
  border:none;
 }
-footer button{
- padding:10px;
- border:none;
- border-radius:6px;
- background:#2563eb;
- color:white;
-}
 </style>
 </head>
 
-<body>
+<body class="mutlu">
+
 <header>DENİZ Z TARAFINDAN YAPILDI</header>
 <div id="logo">🤖 CHATDNZ</div>
+
+<div id="controls">
+ <button onclick="modDegis('mutlu')">😊 Mutlu</button>
+ <button onclick="modDegis('sinirli')">😡 Sinirli</button>
+ <button onclick="modDegis('uzgun')">😢 Üzgün</button>
+ <button onclick="sesToggle()">🔊 Ses</button>
+</div>
 
 <div id="chat"></div>
 
@@ -80,19 +87,33 @@ footer button{
 <script>
 const chat=document.getElementById("chat");
 const inp=document.getElementById("inp");
+let sesAcik=true;
+let mod="mutlu";
 
-const cevaplar=[
- "Açıkçası bu soru biraz absürt.",
- "CHATDNZ bunu mantıklı bulmadı.",
- "Bence bu konunun cevabı evrende gizli.",
- "Net konuşayım: saçma ama güzel.",
- "Bunu daha önce duydum, tekrar etmiyorum.",
- "Kafam karıştı ama cevapladım.",
- "Bu tam CHATDNZ'lik bir soru."
-];
+const cevaplar={
+ mutlu:[
+  "Hayat güzel, soru da fena değil.",
+  "CHATDNZ mutlu cevapladı.",
+  "Güzel düşünmüşsün."
+ ],
+ sinirli:[
+  "Ciddi misin?",
+  "Bu soruya sinirlendim.",
+  "Mantık zorlanıyor."
+ ],
+ uzgun:[
+  "Biraz hüzünlü bir soru.",
+  "Bunu düşünmek yorucu.",
+  "Sessizce cevaplıyorum."
+ ]
+};
 
-function rand(){
- return cevaplar[Math.floor(Math.random()*cevaplar.length)];
+function konus(m){
+ if(!sesAcik) return;
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(m);
+ u.lang="tr-TR";
+ speechSynthesis.speak(u);
 }
 
 function ekle(tur,metin){
@@ -101,6 +122,7 @@ function ekle(tur,metin){
  d.textContent=metin;
  chat.appendChild(d);
  chat.scrollTop=chat.scrollHeight;
+ kaydet();
 }
 
 function gonder(){
@@ -110,17 +132,40 @@ function gonder(){
  inp.value="";
  setTimeout(()=>{
   let c;
-  if(t.toLowerCase().includes("kim yaptı")) c="Beni DENİZ Z yaptı.";
-  else if(t.toLowerCase().includes("şiir"))
-   c="Bir gün kodlar sustu, mantık kaçtı.";
-  else c=rand();
+  if(t.toLowerCase().includes("kim yaptı"))
+    c="Beni DENİZ Z yaptı.";
+  else
+    c=cevaplar[mod][Math.floor(Math.random()*cevaplar[mod].length)];
   ekle("bot","CHATDNZ: "+c);
- },150);
+  konus(c);
+ },200);
+}
+
+function modDegis(m){
+ mod=m;
+ document.body.className=m;
+}
+
+function sesToggle(){
+ sesAcik=!sesAcik;
+ alert(sesAcik?"Ses Açık":"Ses Kapalı");
+}
+
+function kaydet(){
+ localStorage.setItem("chatdnz",chat.innerHTML);
+}
+
+function yukle(){
+ const d=localStorage.getItem("chatdnz");
+ if(d) chat.innerHTML=d;
 }
 
 inp.addEventListener("keydown",e=>{
  if(e.key==="Enter") gonder();
 });
+
+yukle();
 </script>
+
 </body>
 </html>
