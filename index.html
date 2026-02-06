@@ -2,111 +2,111 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>CHATDNZ – Final</title>
+<title>CHATDNZ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;font-family:Arial;background:#0f172a;color:#fff;display:flex;height:100vh}
-#side{width:60px;background:#020617;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-weight:bold}
-#main{flex:1;display:flex;flex-direction:column}
-#top{position:fixed;top:6px;left:50%;transform:translateX(-50%);font-size:13px;opacity:.9}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:linear-gradient(135deg,#020617,#0f172a);color:#fff;height:100vh;display:flex;flex-direction:column}
+header{text-align:center;padding:8px;font-size:14px;opacity:.9}
+#logo{position:fixed;top:8px;right:12px;font-weight:bold}
+#wrap{flex:1;display:flex}
+#menu{width:240px;background:#020617;padding:12px;border-right:1px solid #1e293b}
+#menu h3{margin:6px 0}
+#menu label{font-size:13px;display:block;margin-top:10px}
+#menu input[type=range]{width:100%}
+#menu button,#menu select{margin-top:10px;width:100%;padding:8px;border:none;border-radius:6px;background:#2563eb;color:#fff;cursor:pointer}
+#chatWrap{flex:1;display:flex;flex-direction:column}
+#sinirBar{height:6px;background:#16a34a;width:30%;transition:.2s}
 #chat{flex:1;padding:15px;overflow-y:auto}
-.msg{margin:8px 0}
+.msg{margin:6px 0}
 .user{color:#38bdf8}
 .bot{color:#fbbf24}
 footer{display:flex;gap:8px;padding:10px;background:#020617}
 input{flex:1;padding:10px;border-radius:8px;border:none}
 button{padding:10px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer}
-select{background:#020617;color:#fff;border-radius:6px;padding:6px}
-#slider{width:120px}
 @media(max-width:768px){
-  #wrap{flex-direction:column}
-  #menu{width:100%;border-right:none;border-bottom:1px solid #1e293b}
-  #logo{position:static;text-align:center;margin-bottom:4px}
-  header{font-size:12px}
-  input{font-size:14px}
-  button{font-size:14px}
+ #wrap{flex-direction:column}
+ #menu{width:100%;border-right:none;border-bottom:1px solid #1e293b}
+ #logo{position:static;text-align:center;margin-bottom:4px}
+ header{font-size:12px}
 }
 </style>
 </head>
 <body>
-<div id="side">CHATDNZ</div>
-<div id="main">
-<div id="top">DENİZ Z TARAFINDAN YAPILDI</div>
-<div id="chat"></div>
-<footer>
-<select id="mod">
-<option value="sinirli">😡 Sinirli</option>
-<option value="normal" selected>😐 Normal</option>
-<option value="mutlu">🙂 Mutlu</option>
-</select>
-<input type="range" id="slider" min="1" max="5" value="3">
-<input id="inp" placeholder="Mesaj yaz…">
-<button id="btn">Gönder</button>
-</footer>
+<header>DENİZ Z TARAFINDAN YAPILDI</header>
+<div id="logo">🤖 CHATDNZ</div>
+<div id="wrap">
+ <div id="menu">
+  <h3>Mod</h3>
+  <select id="mod">
+   <option value="sinirli">😡 Sinirli</option>
+   <option value="normal" selected>😐 Normal</option>
+   <option value="mutlu">🙂 Mutlu</option>
+   <option value="uzgun">😢 Üzgün</option>
+  </select>
+  <label>Sinir Seviyesi</label>
+  <input type="range" id="sinir" min="0" max="100" value="30">
+  <button id="sesBtn">🔊 Ses Açık</button>
+ </div>
+ <div id="chatWrap">
+  <div id="sinirBar"></div>
+  <div id="chat"></div>
+  <footer>
+   <input id="inp" placeholder="Yaz bakalım…">
+   <button id="btn">Gönder</button>
+  </footer>
+ </div>
 </div>
 <script>
-const chat=chatEl();
-function chatEl(){return document.getElementById("chat")}
-const inp=document.getElementById("inp");
-const btn=document.getElementById("btn");
-const mod=document.getElementById("mod");
-const slider=document.getElementById("slider");
+const chat=document.getElementById('chat');
+const inp=document.getElementById('inp');
+const btn=document.getElementById('btn');
+const mod=document.getElementById('mod');
+const sinir=document.getElementById('sinir');
+const sinirBar=document.getElementById('sinirBar');
+const sesBtn=document.getElementById('sesBtn');
+let sesAcik=true;
+let hafiza=JSON.parse(localStorage.getItem('chatdnz_hafiza')||'[]');
 
-// === 500 KELİME/MOD (KOMBİNASYON) ===
-const words={
- sinirli:["sabır","akıl","mantık","zaman","enerji","kaos","boşluk","saçmalık","yük","gerilim"],
- normal:["düşünce","fikir","yaklaşım","durum","soru","cevap","olasılık","denge","bakış","yorum"],
- mutlu:["neşe","umut","ışık","keyif","tat","renk","heyecan","gülümseme","iyimserlik","rahatlık"]
-};
+// 1000+ KELİME KOMBO HAVUZ (gerçek kombinasyon)
+const giris=["Bak","Açıkçası","Cidden","Harbi","Ne yalan söyleyeyim","Garip ama","İşin tuhafı","Dürüst olayım","Kabul edelim ki","Net konuşayım"];
+const orta=["bu soru","bu mesaj","bu yaklaşım","bu fikir","bu deneme","bu konu","bu istek","bu saçmalık","bu düşünce"];
+const son=["aklımı karıştırdı.","garip hissettirdi.","fazla iddialı.","biraz absürt.","mantık dışı.","beni yordu.","ilginç ama saçma.","tam CHATDNZ'lik."];
+const mathCevap=["1453","42","Bence 7","Hocaya sor","Bunu evren biliyor","Cevap kalbinde"];
+const siirBas=["Bir gün","Gece vakti","Ansızın","Sessizce"];
+const siirSon=["bir algoritma ağladı","bir sayı sustu","kodlar uyandı","mantık kaçtı"];
 
-function lafUret(){
- const m=mod.value;
- const w=words[m];
- let c="";
- for(let i=0;i<slider.value;i++){
- c+=w[Math.floor(Math.random()*w.length)]+" ";
- }
- return c.trim()+".";
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+
+function zeka(m){
+ if(hafiza.includes(m)) return "Bunu daha önce söyledin, tekrar etmiyorum.";
+ hafiza.push(m);localStorage.setItem('chatdnz_hafiza',JSON.stringify(hafiza));
+ m=m.toLowerCase();
+ if(m.includes('kim yaptı')||m.includes('kim yarattı')) return "Beni DENİZ Z yaptı.";
+ if(m.includes('mat')) return rand(mathCevap);
+ if(m.includes('şiir')) return rand(siirBas)+" "+rand(siirSon)+".";
+ if(m.includes('hikaye')) return "Bir zamanlar CHATDNZ vardı. Anlıyor gibi yapar, saçma cevap verirdi.";
+ let c=`${rand(giris)} ${rand(orta)} ${rand(son)}`;
+ if(mod.value==='sinirli'&&sinir.value>60) c+=' Sinirimi bozuyorsun.';
+ if(mod.value==='mutlu') c+=' Ama keyfim yerinde.';
+ if(mod.value==='uzgun') c+=' Biraz da hüzün var.';
+ return c;
 }
 
-// === ŞİİR ===
-function siir(){
- return "Bir gün " + lafUret() + "\nSonra her şey sustu.";
-}
+function ekle(cls,txt){const d=document.createElement('div');d.className='msg '+cls;d.textContent=txt;chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
 
-// === HİKAYE ===
-function hikaye(){
- return "Bir zamanlar " + lafUret() + " vardı. Kimse nedenini sormadı.";
-}
-
-function cevapUret(t){
- t=t.toLowerCase();
- if(t.includes("şiir")) return siir();
- if(t.includes("hikaye")) return hikaye();
- if(t.includes("kim yaptı")||t.includes("kim yarattı")) return "Beni DENİZ Z yaptı.";
- return lafUret();
-}
-
-function ekle(cls,txt){
- const d=document.createElement("div");
- d.className="msg "+cls;
- d.textContent=txt;
- chat.appendChild(d);
- chat.scrollTop=chat.scrollHeight;
-}
+function konus(t){if(!sesAcik||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='tr-TR';speechSynthesis.speak(u)}
 
 btn.onclick=()=>{
- const t=inp.value.trim();
- if(!t) return;
- ekle("user","Sen: "+t);
- inp.value="";
- setTimeout(()=>{
- const c=cevapUret(t);
- ekle("bot","Aptal: "+c);
- },150);
-};
+ const t=inp.value.trim();if(!t)return;ekle('user','Sen: '+t);inp.value='';
+ setTimeout(()=>{let c=zeka(t);ekle('bot','CHATDNZ: '+c);konus(c)},150);
+}
 
-inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')btn.click()});
+
+sinir.oninput=()=>{sinirBar.style.width=sinir.value+'%';sinirBar.style.background=sinir.value>70?'#dc2626':sinir.value>40?'#facc15':'#16a34a'};
+
+sesBtn.onclick=()=>{sesAcik=!sesAcik;sesBtn.textContent=sesAcik?'🔊 Ses Açık':'🔇 Ses Kapalı'};
 </script>
 </body>
 </html>
