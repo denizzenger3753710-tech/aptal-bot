@@ -71,6 +71,8 @@ const mod=document.getElementById('mod');
 const sinir=document.getElementById('sinir');
 const sinirBar=document.getElementById('sinirBar');
 const sesBtn=document.getElementById('sesBtn');
+// yazıyor animasyonu
+const typingIndicator=document.createElement('div');typingIndicator.textContent='CHATDNZ yazıyor…';typingIndicator.style.opacity='0.6';typingIndicator.style.display='none';typingIndicator.style.padding='6px';chat.appendChild(typingIndicator);
 const voiceSel=document.getElementById('voiceSel');
 const typing=document.getElementById('typing');
 const clearBtn=document.getElementById('clearBtn');
@@ -92,6 +94,10 @@ const siirSon=["bir algoritma ağladı","bir sayı sustu","kodlar uyandı","mant
 function rand(a){return a[Math.floor(Math.random()*a.length)]}
 
 function zeka(m){
+ // gelişmiş beyin: benzer soruları da engelle
+ if(hafiza.some(x=>m.toLowerCase().includes(x))) return "Bu konuya daha önce girdik, tekrara düşmem.";
+ hafiza.push(m.toLowerCase());
+ localStorage.setItem('chatdnz_hafiza',JSON.stringify(hafiza));
  if(hafiza.includes(m)) return "Bunu daha önce sordun, tekrar etmiyorum.";
  hafiza.push(m);
  localStorage.setItem('chatdnz_hafiza',JSON.stringify(hafiza));
@@ -127,12 +133,14 @@ btn.onclick=()=>{
  sohbet.push({k:'user',t:'Sen: '+t});
  inp.value='';
  typing.style.display='block';
+ typingIndicator.style.display='block';
  setTimeout(()=>{
   typing.style.display='none';
   const c=zeka(t);
   ekle('bot','CHATDNZ: '+c);
   sohbet.push({k:'bot',t:'CHATDNZ: '+c});
   localStorage.setItem('chatdnz_sohbet',JSON.stringify(sohbet));
+  typingIndicator.style.display='none';
   konus(c);
  },400);
 };
