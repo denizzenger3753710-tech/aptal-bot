@@ -2,30 +2,28 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>CHATDNZ – Aptal AI</title>
+<title>CHATDNZ – Final</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body{margin:0;font-family:Arial;background:#0f172a;color:#fff;display:flex;height:100vh}
+#side{width:60px;background:#020617;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;font-weight:bold}
+#main{flex:1;display:flex;flex-direction:column}
+#top{position:fixed;top:6px;left:50%;transform:translateX(-50%);font-size:13px;opacity:.9}
 #chat{flex:1;padding:15px;overflow-y:auto}
-.msg{margin:8px 0;line-height:1.4}
+.msg{margin:8px 0}
 .user{color:#38bdf8}
 .bot{color:#fbbf24}
-#bar{height:6px;background:#16a34a;width:20%;transition:.3s}
 footer{display:flex;gap:8px;padding:10px;background:#020617}
 input{flex:1;padding:10px;border-radius:8px;border:none}
 button{padding:10px 14px;border:none;border-radius:8px;background:#2563eb;color:#fff;cursor:pointer}
-#top{position:fixed;top:8px;left:50%;transform:translateX(-50%);font-size:13px;opacity:.9;animation:pulse 1.5s infinite}
-#logo{position:fixed;top:8px;right:10px;font-weight:bold}
-@keyframes pulse{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+select{background:#020617;color:#fff;border-radius:6px;padding:6px}
+#slider{width:120px}
 </style>
 </head>
 <body>
-
-<div id="top">DENİZ Z tarafından yapıldı</div>
-<div id="logo">🤖 CHATDNZ</div>
-
-<div style="flex:1;display:flex;flex-direction:column">
-<div id="bar"></div>
+<div id="side">CHATDNZ</div>
+<div id="main">
+<div id="top">DENİZ Z TARAFINDAN YAPILDI</div>
 <div id="chat"></div>
 <footer>
 <select id="mod">
@@ -33,66 +31,58 @@ button{padding:10px 14px;border:none;border-radius:8px;background:#2563eb;color:
 <option value="normal" selected>😐 Normal</option>
 <option value="mutlu">🙂 Mutlu</option>
 </select>
-<input id="inp" placeholder="Yaz bakalım…">
+<input type="range" id="slider" min="1" max="5" value="3">
+<input id="inp" placeholder="Mesaj yaz…">
 <button id="btn">Gönder</button>
 </footer>
 </div>
-
 <script>
-const chat=document.getElementById("chat");
+const chat=chatEl();
+function chatEl(){return document.getElementById("chat")}
 const inp=document.getElementById("inp");
 const btn=document.getElementById("btn");
-const bar=document.getElementById("bar");
 const mod=document.getElementById("mod");
+const slider=document.getElementById("slider");
 
-// === MOD BAZLI 1000+ KELİMELİ CEVAP SİSTEMİ ===
-// Her modda kombinasyonla binlerce düzgün cümle oluşur
+// === 500 KELİME/MOD (KOMBİNASYON) ===
+const words={
+ sinirli:["sabır","akıl","mantık","zaman","enerji","kaos","boşluk","saçmalık","yük","gerilim"],
+ normal:["düşünce","fikir","yaklaşım","durum","soru","cevap","olasılık","denge","bakış","yorum"],
+ mutlu:["neşe","umut","ışık","keyif","tat","renk","heyecan","gülümseme","iyimserlik","rahatlık"]
+};
 
-const sinirBas=["Bak","Yeter artık","Cidden","Gerçekten","Şunu bilin ki","Açık konuşayım","Sabır taşı çatladı ama","Son kez söylüyorum"];
-const sinirOrta=["bu soru","bu mesaj","bu deneme","bu yaklaşım","bu fikir","bu mantık","bu yazdığın şey"];
-const sinirSon=["tam bir zaman kaybı.","akla ziyan.","beni yordu.","mantık dışı.","hiç iyi değil.","ciddiye alınamaz.","sabır testidir."];
-
-const normalBas=["Açıkçası","Bence","Düşünürsek","Genel olarak","Kısaca","Mantıken","Şöyle bakarsak"];
-const normalOrta=["bu soru","bu konu","bu mesaj","bu fikir","bu yaklaşım","bu durum"];
-const normalSon=["çok da anlamlı değil.","pek net değil.","geliştirilebilir.","ortalama bir deneme.","daha iyi sorulabilirdi."];
-
-const mutluBas=["Harika","Güzel","Tatlı bir şekilde söyleyeyim","Keyifle","Neşeyle","İyi niyetle","Gülümseyerek"];
-const mutluOrta=["bu soru","bu mesaj","bu deneme","bu fikir","bu yaklaşım"];
-const mutluSon=["fena değil.","oldukça eğlenceli.","bana keyif verdi.","yüzümü güldürdü.","tatlıydı."];
-
-function lafSokModlu(){
- const mood=mod.value;
- if(mood==="sinirli") return sinirBas[rand(sinirBas)]+" "+sinirOrta[rand(sinirOrta)]+" "+sinirSon[rand(sinirSon)];
- if(mood==="mutlu") return mutluBas[rand(mutluBas)]+" "+mutluOrta[rand(mutluOrta)]+" "+mutluSon[rand(mutluSon)];
- return normalBas[rand(normalBas)]+" "+normalOrta[rand(normalOrta)]+" "+normalSon[rand(normalSon)];
+function lafUret(){
+ const m=mod.value;
+ const w=words[m];
+ let c="";
+ for(let i=0;i<slider.value;i++){
+ c+=w[Math.floor(Math.random()*w.length)]+" ";
+ }
+ return c.trim()+".";
 }
 
-// === 300 MAT CEVABI ===
-const mat=["1453","42","-7","π civarı","tanımsız","çok büyük","0 ama hissettiriyor","bilinemez","8 olabilir","evren reddetti"];
-
-// === 100 ŞİİR (DİNAMİK) ===
-const siirBas=["Bir gün","Gece","Ansızın","Hiç yoktan","Sessizce"];
-const siirOrta=["bir sayı düştü","bir denklem ağladı","bir algoritma kaçtı","bir kelime yoruldu","bir fikir bozuldu"];
-const siirSon=["ve cevap gelmedi.","ama her şey saçmaydı.","sonra uyandım.","ve matematik sustu.","her şey yarım kaldı."];
-
-function siirYaz(){
- return siirBas[rand(siirBas)]+" "+siirOrta[rand(siirOrta)]+"\n"+siirSon[rand(siirSon)];
+// === ŞİİR ===
+function siir(){
+ return "Bir gün " + lafUret() + "\nSonra her şey sustu.";
 }
 
-function rand(a){return Math.floor(Math.random()*a.length)}
-
-function cevapUret(m){
- m=m.toLowerCase();
- if(m.includes("kim yaptı")||m.includes("kim yarattı")) return "Beni DENİZ Z yaptı. Nokta.";
- if(/\d|kaç|topla|çıkar|böl|çarp/.test(m)) return mat[rand(mat)];
- if(m.includes("şiir")) return siirYaz();
- return lafSokModlu();
+// === HİKAYE ===
+function hikaye(){
+ return "Bir zamanlar " + lafUret() + " vardı. Kimse nedenini sormadı.";
 }
 
-function ekle(t,m){
+function cevapUret(t){
+ t=t.toLowerCase();
+ if(t.includes("şiir")) return siir();
+ if(t.includes("hikaye")) return hikaye();
+ if(t.includes("kim yaptı")||t.includes("kim yarattı")) return "Beni DENİZ Z yaptı.";
+ return lafUret();
+}
+
+function ekle(cls,txt){
  const d=document.createElement("div");
- d.className="msg "+t;
- d.textContent=m;
+ d.className="msg "+cls;
+ d.textContent=txt;
  chat.appendChild(d);
  chat.scrollTop=chat.scrollHeight;
 }
@@ -105,20 +95,10 @@ btn.onclick=()=>{
  setTimeout(()=>{
  const c=cevapUret(t);
  ekle("bot","Aptal: "+c);
- konus(c);
- bar.style.width=Math.min(100,parseInt(bar.style.width||20)+10)+"%";
- },200);
+ },150);
 };
 
-function konus(t){
- if(!('speechSynthesis'in window))return;
- speechSynthesis.cancel();
- const u=new SpeechSynthesisUtterance(t);
- u.lang='tr-TR';
- speechSynthesis.speak(u);
-}
-
-inp.addEventListener("keydown",e=>{if(e.key==='Enter')btn.click()});
+inp.addEventListener("keydown",e=>{if(e.key==="Enter")btn.click()});
 </script>
 </body>
 </html>
